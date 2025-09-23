@@ -64,8 +64,61 @@ export default function Login() {
       await createUserDocFromAuth(user);
       navigate("/");
     } catch (error) {
-      console.log(error);
-      setError(loginErrorMessage(error));
+      if (error.code === "auth/multi-factor-auth-required") {
+        try {
+          const resolver = getMultiFactorResolver(auth, error);
+          const phoneHint = resolver.hints.find(
+            (h) => h.factorId === PhoneMultiFactorGenerator.FACTOR_ID
+          );
+          if (!phoneHint) {
+            setError(
+              "A second factor is required for this account, but no supported factor was found."
+            );
+            return;
+          }
+
+          if (!recaptchaRef.current) {
+            recaptchaRef.current = new RecaptchaVerifier(
+              auth,
+              "recaptcha-container-id",
+              { size: "invisible" }
+            );
+          }
+
+          setMfaStatus("Sending SMS code…");
+          const provider = new PhoneAuthProvider(auth);
+          const verificationId = await provider.verifyPhoneNumber(
+            { multiFactorHint: phoneHint, session: resolver.session },
+            recaptchaRef.current
+          );
+
+          setMfaStatus("");
+
+          const verificationCode = window.prompt("Enter the SMS code");
+          if (!verificationCode) {
+            setError("SMS verification cancelled.");
+            return;
+          }
+
+          setMfaStatus("Verifying SMS code...");
+          const cred = PhoneAuthProvider.credential(
+            verificationId,
+            verificationCode
+          );
+          const assertion = PhoneMultiFactorGenerator.assertion(cred);
+          await resolver.resolveSignIn(assertion);
+
+          setMfaStatus("");
+          navigate("/");
+        } catch (error) {
+          console.log(error);
+          setMfaStatus("");
+          setError(loginErrorMessage(error));
+        }
+      } else {
+        console.log(error);
+        setError(loginErrorMessage(error));
+      }
     } finally {
       setLoading(false);
     }
