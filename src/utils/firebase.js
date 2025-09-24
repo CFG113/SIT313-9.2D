@@ -26,6 +26,7 @@ import {
   deleteDoc,
   increment,
   where,
+  orderBy,
 } from "firebase/firestore";
 
 import {
@@ -117,6 +118,16 @@ export const createTutorialDocFromData = async (tutorialData) => {
 export const fetchTutorialsAndDocuments = () => {
   const collectionRef = collection(db, "tutorials");
   const q = query(collectionRef, orderBy("createdAt", "desc"));
+  return q;
+};
+
+export const fetchUserTutorials = (uid) => {
+  const collectionRef = collection(db, "tutorials");
+  const q = query(
+    collectionRef,
+    where("uploaderUid", "==", uid),
+    orderBy("createdAt", "desc")
+  );
   return q;
 };
 

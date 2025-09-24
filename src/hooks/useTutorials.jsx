@@ -1,12 +1,6 @@
 import { useEffect, useState } from "react";
-import { db } from "@/utils/firebase";
-import {
-  collection,
-  query,
-  where,
-  orderBy,
-  onSnapshot,
-} from "firebase/firestore";
+import { onSnapshot } from "firebase/firestore";
+import { fetchUserTutorials } from "@/utils/firebase";
 
 export default function useTutorials(uid) {
   const [tutorials, setTutorials] = useState([]);
@@ -14,14 +8,10 @@ export default function useTutorials(uid) {
 
   useEffect(() => {
     setLoading(true);
-    const q = query(
-      collection(db, "tutorials"),
-      where("uploaderUid", "==", uid),
-      orderBy("createdAt", "desc")
-    );
+    const queryRef = fetchUserTutorials(uid);
 
-    const unsub = onSnapshot(
-      q,
+    const unsubscribe = onSnapshot(
+      queryRef,
       (snap) => {
         setTutorials(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
         setLoading(false);
@@ -33,7 +23,7 @@ export default function useTutorials(uid) {
       }
     );
 
-    return () => unsub();
+    return () => unsubscribe();
   }, [uid]);
 
   return { tutorials, loading };
