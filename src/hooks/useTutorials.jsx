@@ -6,7 +6,15 @@ export default function useTutorials(uid) {
   const [tutorials, setTutorials] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Listen for real time updates for when a user adds a tutorial to render it in their tutorial page
   useEffect(() => {
+    // Prevent If user logs on on the tutorials page
+    if (!uid) {
+      setTutorials([]);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     const queryRef = fetchUserTutorials(uid);
 
@@ -16,14 +24,14 @@ export default function useTutorials(uid) {
         setTutorials(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
         setLoading(false);
       },
-      (err) => {
-        console.error("tutorials query error:", err);
+      (error) => {
+        console.error("tutorials query error:", error);
         setTutorials([]);
         setLoading(false);
       }
     );
 
-    return () => unsubscribe();
+    return () => unsubscribe(); // remove the listener when the user changes
   }, [uid]);
 
   return { tutorials, loading };

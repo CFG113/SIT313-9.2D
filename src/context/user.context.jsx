@@ -13,15 +13,17 @@ const INITIAL_STATE = {
   currentUser: null,
 };
 
+//Used to distribute the context to its child components
 export const UserProvider = ({ children }) => {
   // const [currentUser, setCurrentUser] = useState(null);
-  const [{ currentUser }, dispatch] = useReducer(UserReducer, INITIAL_STATE); // Managing the auth state transitions
+  const [{ currentUser }, dispatch] = useReducer(UserReducer, INITIAL_STATE); // Managing auth state transitions explictly
   const [loading, setLoading] = useState(false);
 
   const setCurrentUser = (user) => {
     dispatch({ type: "SET_CURRENT_USER", payload: user });
   };
 
+  // Listen for when the auth state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);

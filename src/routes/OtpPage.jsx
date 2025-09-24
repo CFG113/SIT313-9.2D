@@ -37,6 +37,7 @@ const OtpPage = () => {
   const [sent, setSent] = useState("");
 
   useEffect(() => {
+    // Auto-send SMS once when user & phone exist
     if (!currentUser) return;
 
     getDoc(doc(db, "users", currentUser.uid)).then((snap) => {
@@ -44,6 +45,7 @@ const OtpPage = () => {
       setPhone(number);
       if (!number || autoSentOnce) return;
 
+      // Init invisible reCAPTCHA (single instance)
       if (!recaptchaVerifier) {
         recaptchaVerifier = new RecaptchaVerifier(
           auth,
@@ -55,22 +57,21 @@ const OtpPage = () => {
       }
 
       autoSentOnce = true;
+
+      // Start MFA session and send SMS
       multiFactor(currentUser)
         .getSession()
-        .then((multiFactorSession) => {
-          const phoneInfoOptions = {
-            phoneNumber: number,
-            session: multiFactorSession,
-          };
-          const phoneAuthProvider = new PhoneAuthProvider(auth);
-          return phoneAuthProvider.verifyPhoneNumber(
+        .then((session) => {
+          const phoneInfoOptions = { phoneNumber: number, session };
+          const provider = new PhoneAuthProvider(auth);
+          return provider.verifyPhoneNumber(
             phoneInfoOptions,
             recaptchaVerifier
           );
         })
         .then((vid) => {
           verificationId = vid;
-          setSent("SMS code sent."); // <-- was notice
+          setSent("SMS code sent.");
           setError("");
         })
         .catch((err) => {
@@ -109,15 +110,18 @@ const OtpPage = () => {
     }
 
     try {
+      // Build phone credential, verify mfa then enroll user
       const cred = PhoneAuthProvider.credential(verificationId, otp);
       const assertion = PhoneMultiFactorGenerator.assertion(cred);
       await multiFactor(currentUser).enroll(assertion, phone || "My phone");
+
+      // Refresh user and redirect
       await currentUser.reload();
       setCurrentUser(currentUser);
-      setSent("Phone verified. Redirecting…"); // success message
+      setSent("Phone verified. Redirecting…");
       navigate("/");
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(error);
       setError("Failed to verify the code. Please try again.");
     } finally {
       setLoading(false);

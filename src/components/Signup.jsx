@@ -59,7 +59,7 @@ function Signup() {
     setError("");
     setLoading(true);
 
-    // one-shot client validation
+    // Validate Sing up form
     const msg = validateSignupForm(contact);
     if (msg) {
       setError(msg);
@@ -67,7 +67,7 @@ function Signup() {
       return;
     }
 
-    // derive E.164 after validation
+    // validate and get the aus phone number
     const phoneNumber = validatePhoneNumber(phone);
 
     try {

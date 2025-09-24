@@ -9,7 +9,7 @@ function TutorialsPage() {
   const navigate = useNavigate();
   const { currentUser } = useContext(UserContext);
 
-  const { tutorials, loading } = useTutorials(currentUser.uid);
+  const { tutorials, loading } = useTutorials(currentUser?.uid);
 
   return (
     <Container size="5">

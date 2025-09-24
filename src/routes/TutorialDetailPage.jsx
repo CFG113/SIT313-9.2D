@@ -96,7 +96,7 @@ function TutorialDetailPage() {
   async function handleSubmitReview(rating) {
     try {
       if (!currentUser || !id) return;
-      await addTutorialRating(id, currentUser.uid, rating); // your one-per-user writer
+      await addTutorialRating(id, currentUser.uid, rating);
       setCanReview(false);
       setReviewSubmitted(true);
     } catch (e) {
@@ -111,8 +111,8 @@ function TutorialDetailPage() {
       setDeleting(true);
       await deleteTutorialDocById(id);
       navigate("/tutorials");
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error(error);
       setError("Failed to delete tutorial");
       setDeleting(false);
     }
@@ -141,7 +141,6 @@ function TutorialDetailPage() {
         </video>
       )}
 
-      {/* actions area */}
       <Separator my="5" />
 
       <Flex justify="between" align="center" mt="3">

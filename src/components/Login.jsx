@@ -36,7 +36,7 @@ export default function Login() {
 
   const [mfaStatus, setMfaStatus] = useState("");
 
-  // reCAPTCHA instance
+  // Persist single RecaptchaVerifier instance without triggering re renders to avoid duplicate widgets
   const recaptchaRef = useRef(null);
 
   useEffect(() => {
@@ -66,6 +66,7 @@ export default function Login() {
     } catch (error) {
       if (error.code === "auth/multi-factor-auth-required") {
         try {
+          // Get MFA resolver from the error, and select the phone factor
           const resolver = getMultiFactorResolver(auth, error);
           const phoneHint = resolver.hints.find(
             (h) => h.factorId === PhoneMultiFactorGenerator.FACTOR_ID
@@ -77,6 +78,7 @@ export default function Login() {
             return;
           }
 
+          // reInitialise reCAPTCHA if no instance
           if (!recaptchaRef.current) {
             recaptchaRef.current = new RecaptchaVerifier(
               auth,
@@ -85,6 +87,7 @@ export default function Login() {
             );
           }
 
+          // Show “sending” while Firebase sends the SMS
           setMfaStatus("Sending SMS code…");
           const provider = new PhoneAuthProvider(auth);
           const verificationId = await provider.verifyPhoneNumber(
@@ -92,14 +95,15 @@ export default function Login() {
             recaptchaRef.current
           );
 
+          // Reset the status and prompt the user to enter the SMS code sent
           setMfaStatus("");
-
           const verificationCode = window.prompt("Enter the SMS code");
           if (!verificationCode) {
             setError("SMS verification cancelled.");
             return;
           }
 
+          // Verify SMS, complete MFA sign-in, then navigate home.
           setMfaStatus("Verifying SMS code...");
           const cred = PhoneAuthProvider.credential(
             verificationId,
@@ -157,6 +161,7 @@ export default function Login() {
             return;
           }
 
+          // reInitialise reCAPTCHA if no instance
           if (!recaptchaRef.current) {
             recaptchaRef.current = new RecaptchaVerifier(
               auth,
@@ -165,7 +170,7 @@ export default function Login() {
             );
           }
 
-          // Show “sending” while Firebase dispatches the SMS
+          // Show “sending” while Firebase sends the SMS
           setMfaStatus("Sending SMS code…");
           const phoneInfoOptions = {
             multiFactorHint: phoneHint,
@@ -177,14 +182,15 @@ export default function Login() {
             recaptchaRef.current
           );
 
+          // Reset the status and prompt the user to enter the SMS code sent
           setMfaStatus("");
-
           const verificationCode = window.prompt("Enter the SMS code");
           if (!verificationCode) {
             setError("SMS verification cancelled.");
             return;
           }
 
+          // Verify SMS, complete MFA sign-in, then navigate home.
           setMfaStatus("Verifying SMS code...");
           const cred = PhoneAuthProvider.credential(
             verificationId,
