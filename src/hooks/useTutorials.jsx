@@ -8,7 +8,7 @@ export default function useTutorials(uid) {
 
   // Listen for real time updates for when a user adds a tutorial to render it in their tutorial page
   useEffect(() => {
-    // Prevent If user logs on on the tutorials page
+    // Prevent If user logs off on the tutorials page
     if (!uid) {
       setTutorials([]);
       setLoading(false);
