@@ -75,7 +75,7 @@ function TutorialDetailPage() {
     return () => clearTimeout(timer);
   }, [tutorial, id, currentUser]);
 
-  // Decide if current user can review (logged in, not owner, not reviewed yet)
+  // Decide if current user can review
   useEffect(() => {
     async function decide() {
       if (!tutorial || !id) return;

@@ -1,4 +1,4 @@
-import { Card, Inset, Text, Flex } from "@radix-ui/themes";
+import { Card, Inset, Text, Flex, AspectRatio } from "@radix-ui/themes";
 import { FaStar } from "react-icons/fa";
 import { FiEye } from "react-icons/fi";
 
@@ -10,19 +10,23 @@ function TutorialCard(props) {
 
   return (
     <Card size="2" variant="surface" style={{ width: 260 }}>
-      <Inset clip="padding-box" side="top" pb="current">
-        <img
-          src={
-            thumbnailUrl ||
-            "https://via.placeholder.com/640x360?text=No+Thumbnail"
-          }
-          alt={title || "Tutorial thumbnail"}
-          style={{
-            display: "block",
-            height: 140,
-            objectFit: "cover",
-          }}
-        />
+      <Inset clip="border-box" side="top" pb="current">
+        <AspectRatio ratio={16 / 9}>
+          <img
+            src={
+              thumbnailUrl ||
+              "https://via.placeholder.com/640x360?text=No+Thumbnail"
+            }
+            alt={title || "Tutorial thumbnail"}
+            loading="lazy"
+            style={{
+              display: "block",
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
+          />
+        </AspectRatio>
       </Inset>
 
       <Text as="div" size="2" weight="bold">
