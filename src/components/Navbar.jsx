@@ -38,6 +38,8 @@ function Navbar() {
         <Flex align="center" justify="between" p="5">
           <Link to="/">Home</Link>
           <Link to="/about">About</Link>
+          <Link to="/connect">Contact Us</Link>
+          <Link to="/questions">Find Question</Link>
 
           {isSignedIn ? (
             <DropdownMenu.Root>

@@ -54,7 +54,7 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 setPersistence(auth, browserLocalPersistence);
 
-// Google provider (force account picker)
+// Google provider
 const provider = new GoogleAuthProvider();
 provider.setCustomParameters({ prompt: "select_account" });
 
@@ -99,7 +99,7 @@ export const createTutorialDocFromData = async (tutorialData) => {
   const tutorialDocRef = doc(collection(db, "tutorials"));
   const { title, videoUrl, thumbnailUrl, uploaderUid, uploaderName } =
     tutorialData;
-  const createdAt = new Date(); // consider serverTimestamp() for ordering
+  const createdAt = new Date();
   try {
     await setDoc(tutorialDocRef, {
       title,
@@ -259,4 +259,57 @@ export const verifyResetCode = (oobCode) => {
 // Confirm the new password using the reset code
 export const confirmResetPassword = (oobCode, newPassword) => {
   return confirmPasswordReset(auth, oobCode, newPassword);
+};
+
+// Create Question
+export const createQuestionDocFromData = async (questionData) => {
+  if (!questionData) return;
+  const docRef = doc(collection(db, "questions"));
+  const { title, description, tags, authorUid } = questionData;
+  const createdAt = new Date();
+
+  try {
+    await setDoc(docRef, { title, description, tags, authorUid, createdAt });
+  } catch (error) {
+    console.log("error in creating ", error);
+  }
+  return docRef;
+};
+
+export const fetchQuestions = () => {
+  const collectionRef = collection(db, "questions");
+  const q = query(collectionRef, orderBy("createdAt", "desc"));
+  return q;
+};
+
+export const createArticleDocFromData = async (articleData) => {
+  if (!articleData) return;
+  const docRef = doc(collection(db, "articles"));
+  const { title, abstract, text, tags, imageUrl } = articleData;
+  const createdAt = new Date();
+
+  try {
+    await setDoc(docRef, { title, abstract, text, tags, imageUrl, createdAt });
+  } catch (error) {
+    console.log("error in creating ", error);
+  }
+  return docRef;
+};
+
+export const uploadImage = async (file) => {
+  if (!file) return "";
+  const fileRef = ref(storage, `articles/${Date.now()}_${file.name}`);
+  const snap = await uploadBytes(fileRef, file);
+  return getDownloadURL(snap.ref);
+};
+
+export const deleteQuestionDocById = async (questionId) => {
+  if (!questionId) return;
+  const questionDocRef = doc(db, "questions", questionId);
+  try {
+    await deleteDoc(questionDocRef);
+  } catch (error) {
+    console.log("error in deleting ", error);
+  }
+  return questionDocRef;
 };

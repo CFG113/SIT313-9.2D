@@ -81,3 +81,56 @@ export const authErrorMessage = (error) => {
       return "Something went wrong creating your account.";
   }
 };
+
+export const cleanTags = (raw) =>
+  Array.from(
+    new Set(
+      (raw || "")
+        .split(/[,\s]+/)
+        .map((t) => t.trim().toLowerCase())
+        .filter(Boolean)
+    )
+  );
+
+export const validateQuestionPost = (
+  { title = "", description = "", tags = "" },
+  { maxTags = 3 } = {}
+) => {
+  const next = {};
+  const titleTrim = title.trim();
+  const descTrim = description.trim();
+  const tagList = cleanTags(tags);
+
+  if (!titleTrim) next.title = "Title is required.";
+  if (!descTrim) next.description = "Description is required.";
+  if (tagList.length > maxTags) next.tags = `Use up to ${maxTags} tags.`;
+
+  return { next, tagList };
+};
+
+export const validateArticlePost = (
+  { title = "", abstract = "", text = "", tags = "", imageFile = null },
+  { maxTags = 3, maxImageMB = 2 } = {}
+) => {
+  const next = {};
+  const titleTrim = title.trim();
+  const abstractTrim = abstract.trim();
+  const textTrim = text.trim();
+  const tagList = cleanTags(tags);
+
+  if (!titleTrim) next.title = "Title is required.";
+  if (!abstractTrim) next.abstract = "Abstract is required.";
+  if (!textTrim) next.text = "Article text is required.";
+
+  if (tagList.length > maxTags) next.tags = `Use up to ${maxTags} tags.`;
+
+  if (imageFile) {
+    const okType = imageFile.type?.startsWith("image/");
+    const okSize = imageFile.size <= maxImageMB * 1024 * 1024;
+    if (!okType || !okSize) {
+      next.image = `Image must be an image file ≤ ${maxImageMB}MB.`;
+    }
+  }
+
+  return { next, tagList };
+};

@@ -11,6 +11,9 @@ import VerifyEmail from "./components/VerifyEmail";
 import OtpPage from "./routes/OtpPage";
 import TutorialDetailPage from "./routes/TutorialDetailPage";
 import ForgotPassword from "./routes/ForgotPassword";
+import FindQuestionPage from "./routes/FindQuestionPage";
+import PostPage from "./routes/PostPage";
+import QuestionDetails from "./routes/QuestionDetails";
 
 function App() {
   return (
@@ -21,16 +24,23 @@ function App() {
         <Route path="connect" element={<ConnectPage />} />
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<Signup />} />
+        <Route path="verifyemail" element={<VerifyEmail />} />
+        <Route path="otp" element={<OtpPage />} />
+        <Route path="forgot-password" element={<ForgotPassword />} />
 
+        {/* Tutorials routes */}
         <Route path="tutorials">
           <Route index element={<TutorialsPage />} />
           <Route path="new" element={<AddTutorialPage />} />
           <Route path=":id" element={<TutorialDetailPage />} />
         </Route>
 
-        <Route path="verifyemail" element={<VerifyEmail />} />
-        <Route path="otp" element={<OtpPage />} />
-        <Route path="forgot-password" element={<ForgotPassword />} />
+        <Route path="post" element={<PostPage />} />
+        {/* Questions routes */}
+        <Route path="questions">
+          <Route index element={<FindQuestionPage />} />
+          <Route path=":id" element={<QuestionDetails />} />
+        </Route>
       </Route>
     </Routes>
   );
