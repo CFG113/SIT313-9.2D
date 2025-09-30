@@ -4,7 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { Theme } from "@radix-ui/themes";
 import { UserProvider } from "./context/user.context";
 import { TutorialsProvider } from "./context/tutorials.context";
-import { QuestionsProvider } from "./context/Questions.context";
+import { QuestionsProvider } from "./context/questions.context";
 import "./index.css";
 import App from "./App.jsx";
 
