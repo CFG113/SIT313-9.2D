@@ -23,7 +23,7 @@ export default function FindQuestionPage() {
   const q = query.trim().toLowerCase();
   const tags = new Set(
     tagsInput
-      .split(/[,\s]+/)
+      .split(",")
       .map((t) => t.trim().toLowerCase())
       .filter(Boolean)
   );

@@ -85,8 +85,8 @@ export const authErrorMessage = (error) => {
 export const cleanTags = (raw) =>
   Array.from(
     new Set(
-      (raw || "")
-        .split(/[,\s]+/)
+      raw
+        .split(",")
         .map((t) => t.trim().toLowerCase())
         .filter(Boolean)
     )
