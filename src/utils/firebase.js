@@ -26,7 +26,9 @@ import {
   deleteDoc,
   increment,
   where,
-  orderBy, // ← needed for fetchTutorialsAndDocuments
+  orderBy,
+  addDoc,
+  onSnapshot,
 } from "firebase/firestore";
 
 import {
@@ -228,7 +230,7 @@ export const signinAuthUserWithEmailAndPassword = async (email, password) => {
   return await signInWithEmailAndPassword(auth, email, password);
 };
 
-// Send a password reset email (redirect to SITE_URL/login after reset)
+// Send a password reset email
 const SITE_URL = import.meta.env.VITE_SITE_URL;
 export const resetPassword = async (email) => {
   if (!email) return;
@@ -313,3 +315,40 @@ export const deleteQuestionDocById = async (questionId) => {
   }
   return questionDocRef;
 };
+
+export async function createCheckoutSession(uid) {
+  const checkoutSessionRef = await addDoc(
+    collection(db, "users", uid, "checkout_sessions"),
+    {
+      price: "price_1SCHtrLwus4HLwaZIAAG4XnL",
+      success_url: SITE_URL,
+      cancel_url: `${SITE_URL}/plans`,
+    }
+  );
+
+  const unsubscribe = onSnapshot(checkoutSessionRef, async (snap) => {
+    const { url, error } = snap.data();
+
+    if (error) {
+      console.error(error);
+      unsubscribe();
+      return;
+    }
+
+    if (url) {
+      window.location.assign(url);
+      unsubscribe();
+    }
+  });
+
+  return checkoutSessionRef;
+}
+
+export default async function isUserPremium() {
+  // refresh the ID token so new custom claims are included
+  await auth.currentUser?.getIdToken(true);
+
+  const decodedToken = await auth.currentUser?.getIdTokenResult();
+
+  return decodedToken?.claims?.stripeRole ? true : false;
+}

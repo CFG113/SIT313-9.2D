@@ -14,7 +14,7 @@ import ForgotPassword from "./routes/ForgotPassword";
 import FindQuestionPage from "./routes/FindQuestionPage";
 import PostPage from "./routes/PostPage";
 import QuestionDetails from "./routes/QuestionDetails";
-
+import PlansPage from "./routes/PlansPage";
 function App() {
   return (
     <Routes>
@@ -41,6 +41,7 @@ function App() {
           <Route index element={<FindQuestionPage />} />
           <Route path=":id" element={<QuestionDetails />} />
         </Route>
+        <Route path="plans" element={<PlansPage />} />
       </Route>
     </Routes>
   );

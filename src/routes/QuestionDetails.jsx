@@ -122,3 +122,7 @@ export default function QuestionDetailPage() {
     </Box>
   );
 }
+
+// How do I optimize my React app without so many useEffect hooks?
+// I'm using lots of useEffect for fetching and state sync.What patterns or libraries can replace them to reduce re - renders and simplify logic ?
+// performance, react-hooks
