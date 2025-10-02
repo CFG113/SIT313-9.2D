@@ -352,3 +352,33 @@ export default async function isUserPremium() {
 
   return decodedToken?.claims?.stripeRole ? true : false;
 }
+
+export const saveQuestion = async (uid, question) => {
+  if (!uid || !question?.id) return;
+
+  const ref = doc(db, "users", uid, "saved_questions", question.id);
+
+  // Save the entire question object plus a savedAt timestamp
+  await setDoc(ref, { ...question, savedAt: new Date() }, { merge: true });
+
+  return ref;
+};
+
+// Check if a question is already saved by a user
+export const isQuestionSaved = async (uid, questionId) => {
+  if (!uid || !questionId) return false;
+  const ref = doc(db, "users", uid, "saved_questions", questionId);
+  const snap = await getDoc(ref);
+  return snap.exists();
+};
+
+//get saved questions for a specific user
+export const fetchSavedQuestions = (uid) => {
+  const colRef = collection(db, "users", uid, "saved_questions");
+  // Order newest saves first; remove orderBy if you don’t store savedAt
+  return query(colRef, orderBy("savedAt", "desc"));
+};
+export const unsaveQuestion = async (uid, questionId) => {
+  if (!uid || !questionId) return;
+  await deleteDoc(doc(db, "users", uid, "saved_questions", questionId));
+};

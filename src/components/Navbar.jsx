@@ -5,6 +5,10 @@ import { UserContext } from "@/context/user.context";
 import { FaUserCircle } from "react-icons/fa";
 import { logout } from "../utils/firebase";
 import { multiFactor, PhoneMultiFactorGenerator } from "firebase/auth";
+import ThemeToggle from "./ThemeToggle";
+import usePremiumStatus from "@/hooks/usePremiumStatus";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCrown } from "@fortawesome/free-solid-svg-icons";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -22,6 +26,8 @@ function Navbar() {
     );
 
   const isSignedIn = isGoogleUser || hasSmsMfa;
+
+  const { isPremium, loading } = usePremiumStatus(currentUser);
 
   const handleLogout = async () => {
     try {
@@ -42,14 +48,31 @@ function Navbar() {
           <Link to="/questions">Find Question</Link>
           <Link to="/plans">Plans & Pricing</Link>
 
+          {!loading && isPremium && <ThemeToggle />}
+
           {isSignedIn ? (
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
                 <Button aria-label="User menu">
-                  <FaUserCircle size={24} />
+                  {isPremium ? (
+                    <FontAwesomeIcon
+                      icon={faCrown}
+                      style={{ color: "gold", fontSize: 22 }}
+                    />
+                  ) : (
+                    <FaUserCircle size={24} />
+                  )}
                 </Button>
               </DropdownMenu.Trigger>
               <DropdownMenu.Content>
+                {isPremium && (
+                  <>
+                    <DropdownMenu.Item asChild>
+                      <Link to="/saved">Saved Items</Link>
+                    </DropdownMenu.Item>
+                    <DropdownMenu.Separator />
+                  </>
+                )}
                 <DropdownMenu.Item asChild>
                   <Link to="/tutorials">My Tutorials</Link>
                 </DropdownMenu.Item>

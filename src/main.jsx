@@ -7,19 +7,22 @@ import { TutorialsProvider } from "./context/tutorials.context";
 import { QuestionsProvider } from "./context/questions.context";
 import "./index.css";
 import App from "./App.jsx";
+import { ThemeProvider } from "./context/theme.context";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Theme>
-      <QuestionsProvider>
-        <BrowserRouter>
-          <UserProvider>
-            <TutorialsProvider>
-              <App />
-            </TutorialsProvider>
-          </UserProvider>
-        </BrowserRouter>
-      </QuestionsProvider>
+      <ThemeProvider>
+        <QuestionsProvider>
+          <BrowserRouter>
+            <UserProvider>
+              <TutorialsProvider>
+                <App />
+              </TutorialsProvider>
+            </UserProvider>
+          </BrowserRouter>
+        </QuestionsProvider>
+      </ThemeProvider>
     </Theme>
   </StrictMode>
 );

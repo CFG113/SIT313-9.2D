@@ -15,6 +15,7 @@ import FindQuestionPage from "./routes/FindQuestionPage";
 import PostPage from "./routes/PostPage";
 import QuestionDetails from "./routes/QuestionDetails";
 import PlansPage from "./routes/PlansPage";
+import SavedPage from "./routes/SavedPage";
 function App() {
   return (
     <Routes>
@@ -42,6 +43,7 @@ function App() {
           <Route path=":id" element={<QuestionDetails />} />
         </Route>
         <Route path="plans" element={<PlansPage />} />
+        <Route path="saved" element={<SavedPage />} />
       </Route>
     </Routes>
   );

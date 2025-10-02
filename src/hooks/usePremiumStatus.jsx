@@ -2,21 +2,29 @@ import { useState, useEffect } from "react";
 import isUserPremium from "@/utils/firebase";
 
 export default function usePremiumStatus(user) {
-  const [premiumStatus, setPremiumStatus] = useState(false);
+  const [isPremium, setIsPremium] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!user) {
-      setPremiumStatus(false);
+      setIsPremium(false);
+      setLoading(false);
       return;
     }
 
-    const checkPremiumStatus = async function () {
-      // isUserPremium reads custom claims via firebase auth
-      setPremiumStatus(await isUserPremium());
-    };
-
-    checkPremiumStatus();
+    setLoading(true);
+    (async () => {
+      try {
+        const result = await isUserPremium();
+        setIsPremium(result);
+      } catch (error) {
+        console.error("isUserPremium failed:", error);
+        setIsPremium(false);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, [user]);
 
-  return premiumStatus;
+  return { isPremium, loading };
 }

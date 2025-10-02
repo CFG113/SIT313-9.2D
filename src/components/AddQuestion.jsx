@@ -4,10 +4,19 @@ import { createQuestionDocFromData } from "../utils/firebase";
 import { useNavigate } from "react-router-dom";
 import { validateQuestionPost } from "../utils/error";
 import { UserContext } from "@/context/user.context";
+import CodeMirror from "@uiw/react-codemirror";
+import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
+import { languages } from "@codemirror/language-data";
+import { oneDark } from "@codemirror/theme-one-dark";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
+import rehypeSanitize from "rehype-sanitize";
 
 export default function AddQuestion() {
   const navigate = useNavigate();
   const { currentUser } = useContext(UserContext);
+  const [view, setView] = useState("write");
 
   const [question, setQuestion] = useState({
     title: "",
@@ -82,22 +91,62 @@ export default function AddQuestion() {
         </Flex>
       </Box>
 
-      {/* Description */}
-      <div className="ui form" style={{ padding: "1rem" }}>
-        <div className="field">
+      <Box style={{ padding: "1rem 1.5rem" }}>
+        <Flex direction="column" gap="3">
           <label style={{ fontWeight: "bold" }}>Describe your problem</label>
-          <textarea
-            rows="8"
-            name="description"
-            value={description}
-            onChange={handleChange}
-            style={{ width: "100%", border: "1px solid black" }}
-          />
-          {errors.description ? (
-            <div className="text-500-red">{errors.description}</div>
-          ) : null}
-        </div>
-      </div>
+
+          <div
+            style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}
+          >
+            <button
+              type="button"
+              onClick={() => setView("write")}
+              disabled={view === "write"}
+            >
+              Write
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("preview")}
+              disabled={view === "preview"}
+            >
+              Preview
+            </button>
+          </div>
+
+          {/* Editor / Preview */}
+          {view === "write" ? (
+            <CodeMirror
+              value={description}
+              height="260px"
+              theme={oneDark}
+              extensions={[
+                markdown({ base: markdownLanguage, codeLanguages: languages }),
+              ]}
+              onChange={(value) => {
+                setQuestion((pre) => ({ ...pre, description: value }));
+                setErrors((pre) => ({ ...pre, description: "", form: "" }));
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                border: "1px solid black",
+                padding: "0.75rem",
+                background: "white",
+                color: "black",
+              }}
+            >
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeSanitize, rehypeHighlight]}
+              >
+                {description || "_Nothing to preview yet…_"}
+              </ReactMarkdown>
+            </div>
+          )}
+        </Flex>
+      </Box>
 
       {/* Tags row */}
       <Box style={{ padding: "1rem 1.5rem" }}>
