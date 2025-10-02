@@ -40,6 +40,7 @@ function Navbar() {
           <Link to="/about">About</Link>
           <Link to="/connect">Contact Us</Link>
           <Link to="/questions">Find Question</Link>
+          <Link to="/plans">Plans & Pricing</Link>
 
           {isSignedIn ? (
             <DropdownMenu.Root>
